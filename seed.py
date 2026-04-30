@@ -1,23 +1,35 @@
 from faker import Faker
-from datetime import datetime
 from random import randint, choice
-from database import SessionLocal
+from database import Session
 from models import Group, Student, Teacher, Subject, Grade
 
 fake = Faker()
-session = SessionLocal()
+session = Session()
 
-# groups
+session.query(Grade).delete()
+session.query(Student).delete()
+session.query(Subject).delete()
+session.query(Teacher).delete()
+session.query(Group).delete()
+session.commit()
+
+# --------------------
+# GROUPS
+# --------------------
 groups = [Group(name=f"Group-{i}") for i in range(1, 4)]
 session.add_all(groups)
 session.commit()
 
-# teachers
+# --------------------
+# TEACHERS
+# --------------------
 teachers = [Teacher(name=fake.name()) for _ in range(5)]
 session.add_all(teachers)
 session.commit()
 
-# subjects
+# --------------------
+# SUBJECTS
+# --------------------
 subjects = []
 for i in range(1, 7):
     subject = Subject(
@@ -29,7 +41,9 @@ for i in range(1, 7):
 session.add_all(subjects)
 session.commit()
 
-# students
+# --------------------
+# STUDENTS
+# --------------------
 students = []
 for _ in range(40):
     student = Student(
@@ -41,16 +55,20 @@ for _ in range(40):
 session.add_all(students)
 session.commit()
 
-# grades
+# --------------------
+# GRADES
+# --------------------
 for student in students:
     for _ in range(randint(10, 20)):
         grade = Grade(
             grade=randint(60, 100),
             student=student,
             subject=choice(subjects),
-            grade_at=fake.date_time_this_year()
+            created_at=fake.date_time_this_year()
         )
         session.add(grade)
 
 session.commit()
 session.close()
+
+print("Database seeded successfully!")
